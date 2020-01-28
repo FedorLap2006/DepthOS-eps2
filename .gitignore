@@ -1,0 +1,4 @@
+.project_structure.txt
+build
+build/*
+DepthOS.*
