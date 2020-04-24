@@ -26,13 +26,13 @@ ASMSOURCES += $(shell find $(FROOT) -name "*.s" -o -name "*.S")
 
 build: $(CSOURCES) $(ASMSOURCES)
 	@echo ------ Build ------
-	$(CC) $(CEMU) $(CCFLAGS) -c  $(CSOURCES)
+	$(CC) -g $(CEMU) $(CCFLAGS) -c  $(CSOURCES)
 
 	@mkdir -p $(FROOT)/build
 
 	@mv *.o $(FROOT)/build/
 
-	$(CC) $(CEMU) -std=$(CSTD) -c $(ASMSOURCES)
+	$(CC) $(CEMU) -std=$(CSTD) -g -c $(ASMSOURCES)
 
 	@mv *.o $(FROOT)/build/
 
@@ -40,6 +40,6 @@ build: $(CSOURCES) $(ASMSOURCES)
 
 	@cp $(FROOT)/build/DepthOS.bin $(FROOT)/DepthOS.elf
 
-test: $(FROOT)/DepthOS
+test: $(FROOT)/DepthOS.elf
 	qemu-system-i386 -M pc-i440fx-2.8 -kernel $(FROOT)/DepthOS.elf
 all: build test

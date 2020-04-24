@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _DEPTHOS_TYPES_H_
+#define _DEPTHOS_TYPES_H_
+
 
 #define nullptr ((void*)0)
 #define NULL ((void*)0)
@@ -20,9 +22,11 @@ typedef unsigned long long int uint64_t;
 
 
 typedef unsigned int uintptr_t;
+typedef uint32_t size_t;
 
 
 typedef uint8_t bool;
 
 #define true 1
 #define false 0
+#endif

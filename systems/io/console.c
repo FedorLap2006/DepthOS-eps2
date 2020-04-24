@@ -51,7 +51,6 @@ void console_clear() {
 }
 
 void console_put_char(char ch) {
-
 	switch (ch) {
 	case '\n':
 		kernel_console.y++;
@@ -85,6 +84,32 @@ void console_put_str(char *str) {
 	int i = 0;
 	while(str[i])
 		console_put_char(str[i++]);
+}
+
+void console_put_number(uint32_t v, uint8_t radix) {
+ 	int acc = v;
+	char c[33], c2[33];
+	int i = 0, j = 0;
+
+	if (v == 0 || radix > 16)
+	{
+		console_put_char('0');
+		return;
+	}
+
+	while (acc > 0)
+	{
+		c[i] = "0123456789abcdef"[acc % radix];
+		acc /= radix;
+		++i;
+	}
+	c[i] = 0;
+	c2[i--] = 0;
+	while(i >= 0)
+		c2[i--] = c[j++];
+  if(radix == 16) 
+    console_put_str("0x");
+  console_put_str(c2);
 }
 
 console_t kernel_console = {

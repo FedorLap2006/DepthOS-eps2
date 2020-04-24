@@ -43,7 +43,7 @@
 ; 	hlt
 ; 	jmp .stop*/
 
-.set OS_STACK_SIZE, 100000
+.set OS_STACK_SIZE, 1000000
 
 .section .boot
 
@@ -70,12 +70,24 @@ stack_top:
 .align 4
 .global _os_entry_point
 
+// .extern set_up_gdt
+
+.extern _gdt_init
+
+// _protected_mode:
+//  call _gdt_init
+//  jmp $0x8, $1f
+// 1:
+//   ret
+
 _os_entry_point:
 	mov $stack_top, %esp
 
 	push %ebx
 	push %eax
 
+//	call set_up_gdt
+	// sti
 	call kmain
 
 	cli 

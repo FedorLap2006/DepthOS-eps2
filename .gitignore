@@ -2,3 +2,7 @@
 build
 build/*
 DepthOS.*
+*/old_*
+*/old_*/*
+*/.*.swp
+*/.*.swo
