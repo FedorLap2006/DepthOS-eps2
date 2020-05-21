@@ -80,7 +80,7 @@ void _gdt_init() {
   kernel_console.print(") [32 - 64] ("); \
   console_put_number(n >> 32, radix); \
   kernel_console.print(") }");
-
+#undef print_i64
 
 /*  kernel_console.print("GDTR: ");
   print_i64(gdtr, 0x10);
@@ -112,6 +112,7 @@ void _gdt_init() {
 #undef print_entry
 */
  __asm__ volatile("lgdt %0" : :"m"(gdtr));
+ kernel_console.print("GDT initialized\n");
 }
 
 uint64_t make_gdtr(void* gdt, uint16_t size) {

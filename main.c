@@ -1,11 +1,11 @@
 #include <depthos/stddef.h>
 #include <io/console.h>
 #include <apps/gdt.h>
-//#include <apps/idt.h>
+#include <apps/idt.h>
 
 // extern void idt_init();
 extern void _gdt_init();
-// extern void _idt_init();
+extern void _idt_init();
 
 // unsigned short *videoMemory = (unsigned short*)0xB8000;
 // void print_str(char* str) {
@@ -38,6 +38,12 @@ void jump_protected() {
   return;
 }
 
+void test_intr(interrupt_env_t env) {
+  kernel_console.print("Hello from custom interrupt\n");
+  console_put_number(env.eax, 0x10);
+  kernel_console.print("\n");
+}
+
 int kmain(int magic_number, void *multiboot_ptr) {
   kernel_console.clear();
 /*
@@ -61,9 +67,18 @@ int kmain(int magic_number, void *multiboot_ptr) {
 	kernel_console.print("If you read this, then IDT works\n");
 
 	return 0;*/
-  
+
   jump_protected();
-
-  kernel_console.print("Hello world after GDT load");
-
+  _idt_init();
+  kernel_console.print("Debug: GDT is working\n");
+  // __asm__ volatile("int $4");
+  // __asm__ volatile("int $3");
+  // __asm__ volatile("int $0x80");
+  // __asm__ volatile("int $255");
+  register_interrupt(0x80, test_intr);
+  __asm__ volatile ("movl $0x10, %eax");
+  __asm__ volatile ("int $0x80");
+  kernel_console.print("Debug: IDT is working\n");
+  // __asm__ volatile("intl $257");
+  // kernel_console.print("HELLO AFTER INTERRUPT\n");
 }

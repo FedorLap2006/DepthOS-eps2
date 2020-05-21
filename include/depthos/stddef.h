@@ -7,6 +7,12 @@
 #define __asm__ asm
 #endif
 
-#define __packed __attribute__((packed))
+#define __attr(...) __attribute__(__VA_ARGS__)
+#define __packed __attr((packed))
+#define __unsafefunc __attr((naked))
+#define __cleanfunc __unsafefunc
+#define __cleanf __cleanfunc
+#define __noreturn __attr((noreturn))
+
 
 #endif
