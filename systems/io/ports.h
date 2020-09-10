@@ -4,15 +4,15 @@
 #include <depthos/types.h>
 
 // id of port
-typedef short int port_id_t;
+typedef uint16_t port_id_t;
 
-// sends to 'port' v (8 bit value)
+// sends 'v' (8 bits) to 'port'
 void port_sendb(port_id_t port, uint8_t v);
-// sends to 'port' v (16 bit value)
+// sends 'v' (16 bits) to 'port'
 void port_sendw(port_id_t port, uint16_t v);
-// reads from 'port' value (8 bit value)
+// reads value (8 bits) from 'port'
 uint8_t port_readb(port_id_t port);
-// reads from 'port' value (16 bit value)
+// reads value (16 bits) from 'port'
 uint16_t port_readw(port_id_t port);
 
 #endif

@@ -1,84 +1,60 @@
 #include <depthos/stddef.h>
 #include <io/console.h>
-#include <apps/gdt.h>
-#include <apps/idt.h>
-
-// extern void idt_init();
-extern void _gdt_init();
-extern void _idt_init();
-
-// unsigned short *videoMemory = (unsigned short*)0xB8000;
-// void print_str(char* str) {
-
-//   for (int i = 0; str[i] != '\0'; i++) {
-//     videoMemory[i] = (videoMemory[i] & 0xFF00) | str[i];
-//   }
-// }
-
-
-/*
-void test_syscall(struct kernel_interrupt_environment env) {
-	kernel_console.print("IDT WOOOOORKING NORMALLY!!!\n");
-//  while(1) {}
-}
-
-__attribute__((noreturn)) void gprot_fault(struct kernel_interrupt_environment env) {
-  kernel_console.print("\n[Panic at ");
-  console_put_number(env.eip, 16);
-  kernel_console.print("]\n\tReason: General Protection Fault");
-  kernel_console.print("\n\tError code: ");
-  console_put_number(env.interrupt_err_code, 16);
-  while(1) {}
-}*/
+#include <io/ports.h>
+#include <apps/kdms.h>
+#include <apps/kims.h>
 
 void jump_protected() {
-  _gdt_init();
-  __asm__ volatile("jmp $0x8, $protected_mode_begin");
-  __asm__ volatile("protected_mode_begin:");
-  return;
+	kdms_std_init(); 	
+	__asm__ volatile("jmp $0x8, $protected_mode_begin");
+	__asm__ volatile("protected_mode_begin:");
+	return;
 }
 
-void test_intr(interrupt_env_t env) {
-  kernel_console.print("Hello from custom interrupt\n");
-  console_put_number(env.eax, 0x10);
-  kernel_console.print("\n");
+static unsigned long int _pit_ticks = 0;
+#define PIT_TPS 1000 // ticks per second
+void timer_interrupt(kims_interrupt_env_t env) {
+	// kernel_console.print("IRQ timer");
+	
+	// kernel_console.print("oh hello");
+
+	// if(_pit_ticks % 1000000000 == 0) {
+	// if(_pit_ticks % 1000000 == 0) {
+	if(_pit_ticks % PIT_TPS == 0) { /* Do something */ }
+	_pit_ticks++;
 }
 
-int kmain(int magic_number, void *multiboot_ptr) {
-  kernel_console.clear();
-/*
-//	print_str("HELLO WORLD!");
-  kernel_console.clear();
-	kernel_console.print("Welcome to the DepthOS v2.0 shell\n");
-	kernel_console.print("[INFO] Initialising GDT...\n");
-	//_gdt_init();
-	kernel_console.print("[OK] GDT Initialised\n");
+void initialise_pit(uint32_t freq) {
+	uint16_t div = (uint16_t)(1193182 / (uint16_t)freq);
+	// uint16_t div = (7159090 + 6/2) / (6 * freq);
+	port_sendb(0x43, 0x36);
 
-	kernel_console.print("[INFO] Initialising IDT...\n");
-	_idt_init();
-	kernel_console.print("[OK] IDT Initialised\n");
+	port_sendb(0x40, div & 0xff);
+	port_sendb(0x40, (div >> 8) & 0xff);
+	kernel_console.print("[KERNEL] PIT is initialised\n");
+}
 
-	register_interrupt_handler(0xD, gprot_fault);
-	register_interrupt_handler(15, test_syscall);
-  register_interrupt_handler(16, test_syscall);
-  kernel_console.print("hello!");
-	__asm__ volatile("int $15");
-  __asm__ volatile("int $16");
-	kernel_console.print("If you read this, then IDT works\n");
 
-	return 0;*/
+/**
+ * Kernel main
+ * @param	magic_number  Magic number of the bootloader, helps get a kind of the bootloader
+ * @param	multiboot_ptr Pointer to the multiboot bootloader payload
+ */
+void kmain(int magic_number, void *multiboot_ptr) {
+	kernel_console.clear();
+	kernel_console.print("Welcome to the DepthOS v2.0 VGA text-mode terminal\n");
+	jump_protected();
 
-  jump_protected();
-  _idt_init();
-  kernel_console.print("Debug: GDT is working\n");
-  // __asm__ volatile("int $4");
-  // __asm__ volatile("int $3");
-  // __asm__ volatile("int $0x80");
-  // __asm__ volatile("int $255");
-  register_interrupt(0x80, test_intr);
-  __asm__ volatile ("movl $0x10, %eax");
-  __asm__ volatile ("int $0x80");
-  kernel_console.print("Debug: IDT is working\n");
-  // __asm__ volatile("intl $257");
-  // kernel_console.print("HELLO AFTER INTERRUPT\n");
+	kims_disable_hwinterrupts();
+
+	kims_std_init();
+
+	// initialise_pit(1000000000); // - picosec
+	// initialise_pit(1000000); // - microsec
+	initialise_pit(1000);
+	kims_register_ihandler(0x20, timer_interrupt, 0x0);
+	
+	kims_enable_hwinterrupts();
+
+	while(1) {}
 }

@@ -6,3 +6,7 @@ DepthOS.*
 */old_*/*
 */.*.swp
 */.*.swo
+*.note
+unusedf_*.*
+notef_*.*
+.kateproject

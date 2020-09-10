@@ -2,7 +2,7 @@
 
 void *memchr(const void *p, int c, size_t n)
 {
-	const char *s = p;
+  const char *s = p;
 	const char *e = s + n;
 
 	while (s != e && *s != c)

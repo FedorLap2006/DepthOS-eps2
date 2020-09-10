@@ -75,13 +75,13 @@ stack_top:
 .extern _gdt_init
 
 // _protected_mode:
-//  call _gdt_init
-//  jmp $0x8, $1f
+//	call _gdt_init
+//	jmp $0x8, $1f
 // 1:
-//   ret
+//	 ret
 
 _os_entry_point:
-	mov $stack_top, %esp
+  mov $stack_top, %esp
 
 	push %ebx
 	push %eax
@@ -90,6 +90,6 @@ _os_entry_point:
 	// sti
 	call kmain
 
-	cli 
+	cli
 1:hlt
 	jmp 1b
