@@ -1,0 +1,5 @@
+[0.0.1] 2020-09-10 FedorLap2006 <fe.lap.prog@gmail.com>
+	* systems/apps: Complete implementation of interrupts system
+	* systems/apps: Rewriting and renaming of the IDT & GDT systems
+	* main.c (initialise_pit): Small PIT setup implementation
+	* CHANGELOG: Addition of the CHANGELOG file
